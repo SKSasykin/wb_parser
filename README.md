@@ -26,4 +26,12 @@ config-sample.php нужно скопировать в config.php
 
 ### Запуск
 
-$ php parser.php
+`$ php parser.php`
+
+или
+
+`run.cmd`
+
+### Обновление
+
+`update.cmd`

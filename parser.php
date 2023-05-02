@@ -1,4 +1,6 @@
 <?php
+    error_reporting(E_ALL ^ E_DEPRECATED ^ E_NOTICE ^ E_WARNING);
+
     require __DIR__ . '/config.php';
 
     require __DIR__ . '/vendor/autoload.php';
@@ -48,11 +50,17 @@
     $supplies = supply(100, 37099783);
 //    print_r($supplies);exit;
 //$supplies = ['WB-GI-46050763'];
+    if(!$supplies) {
+        exit;
+    }
+
 $orders = [];
     foreach($supplies as $supply) {
         $orders = array_merge($orders, orders($supply->id));
     }
 //    print_r($orders);exit;
+
+    echo "orders count: ", count($orders), "\n";
 
     $orderIds = [];
     foreach($orders as $order) {
@@ -67,11 +75,16 @@ $orders = [];
 //    file_put_contents('hz.dat', serialize($orders));exit;
 //    $orders=unserialize(file_get_contents('hz.dat'));
 
+    echo "download stickers ... ";
     $stickers = stickers3($orderIds);
 //print_r($stickers);exit;
+    echo "done\nsorting... ";
     usort($orders, function($a, $b) {
         return strcmp($a->sort . $a->nmId, $b->sort . $b->nmId);
     });
+    echo "done\n";
+
+    echo "download images: \n";
 
     foreach ($orders as $order) {
         $znum = substr($order->nmId, 0, -4) . '0000';
@@ -89,7 +102,7 @@ $orders = [];
             $fileUrl = str_replace('/big/','/c246x328/', current($imgs));
         }
 
-        echo "img order:$order->id:$order->article > $fileUrl";
+        echo " - img order:$order->id:$order->article > $fileUrl";
 //print_r($product); exit;
         $data = getResource($fileUrl);
         if(!$data) {
@@ -124,8 +137,12 @@ $orders = [];
         echo "\n";
     }
 
-    $pdf->output(__DIR__.'/out/file-'.$marker.'.pdf');
-    $xls->output(__DIR__.'/out/file-'.$marker.'.xls');
+    echo "\nsaving files:";
+
+    $pdf->output($pdfFile =__DIR__.'/out/file-'.$marker.'.pdf');
+    $xls->output($xlsFile = __DIR__.'/out/file-'.$marker.'.xls');
+
+    echo " $pdfFile,\n $xlsFile\n\ndone";
 
     function sortNameNormalize($name) {
         foreach (SORT_PRIORITY as $item) {
@@ -217,7 +234,7 @@ $orders = [];
 
     function supply($limit = 50, $offset = 0)
     {
-        echo "+$offset \n";
+//        echo "+$offset \n";
 
         $json = get('api/v3/supplies', ['next' => $offset, 'limit' => $limit,]);
 
@@ -262,6 +279,8 @@ $orders = [];
         curl_setopt($ch, CURLOPT_TIMEOUT, 5);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
 
         $doc = curl_exec($ch);
         curl_close($ch);
@@ -278,12 +297,17 @@ $orders = [];
         curl_setopt($ch, CURLOPT_TIMEOUT, 60);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Accept: application/json',
             'Authorization: ' . KEY,
         ]);
 
         $doc = curl_exec($ch);
+
+        print_r(curl_error($ch));
+
         curl_close($ch);
 
         return $doc;
@@ -300,6 +324,8 @@ $orders = [];
         curl_setopt($ch, CURLOPT_TIMEOUT, 60);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Accept: application/json',
             'Content-type: application/json',
