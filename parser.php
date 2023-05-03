@@ -115,7 +115,7 @@ $orders = [];
         }
 
         if($data) {
-            file_put_contents($file = "/tmp/$num-1.jpg", $data);
+            file_put_contents($file = __DIR__ . "/tmp/$num-1.jpg", $data);
         } else {
             $file = '';
         }
