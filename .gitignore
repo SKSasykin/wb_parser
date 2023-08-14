@@ -1,5 +1,5 @@
 /config.php
-/.idea
-/out/*
-/tmp/*
+/.idea/
+/out/
+/tmp/
 Thumbs.db*
