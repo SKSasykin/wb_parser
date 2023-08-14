@@ -49,18 +49,20 @@
 
     $supplies = supply(100, 37099783);
 //    print_r($supplies);exit;
-//$supplies = ['WB-GI-46050763'];
     if(!$supplies) {
         exit;
     }
 
-$orders = [];
+    echo 'Supplies:', PHP_EOL;
+    $orders = [];
     foreach($supplies as $supply) {
+        echo ' - ', $supply->id, ': ', $supply->name, PHP_EOL;
         $orders = array_merge($orders, orders($supply->id));
     }
 //    print_r($orders);exit;
+//$orders = array_filter($orders, fn($order) => $order->id==983898673);
 
-    echo "orders count: ", count($orders), "\n";
+echo "\nOrders count: ", count($orders), "\n";
 
     $orderIds = [];
     foreach($orders as $order) {
@@ -257,7 +259,7 @@ $orders = [];
     {
         return array_filter(
             $array,
-            fn($item) => !$item->done
+            fn($item) => !$item->done //|| $item->id == 'WB-GI-55070554'
         );
     }
 
