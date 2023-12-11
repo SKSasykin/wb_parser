@@ -4,5 +4,10 @@
         "phpoffice/phpexcel": "^1.8",
       "ext-json": "*",
       "ext-curl": "*"
+    },
+    "autoload": {
+      "psr-4": {
+        "Inc\\": "include"
+      }
     }
 }

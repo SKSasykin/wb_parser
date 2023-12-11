@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+define('K_TCPDF_THROW_EXCEPTION_ERROR', true);
+
 class PDF
 {
     private TCPDF $pdf;
@@ -60,8 +62,14 @@ class PDF
             'stretchtext'  => 4,
         ];
 
-        $this->pdf->write1DBarcode($code, 'EAN13', 20, 5, 130, 30, 1, $style, 'N');
-        $this->pdf->Ln(5);
+        try {
+            $this->pdf->write1DBarcode($code, 'EAN13', 20, 5, 130, 30, 1, $style, 'N');
+            $this->pdf->Ln(5);
+        } catch (\Throwable $throwable) {
+            $this->pdf->Cell(0, 0, "ERROR EAN13 CODE", 2, 1);
+            $this->pdf->Ln();
+            echo "\n[!] error barcode: $code\n";
+        }
         $this->pdf->Cell(0, 0, $code, 0, 1, 'C');
 
         $this->pdf->Ln();
