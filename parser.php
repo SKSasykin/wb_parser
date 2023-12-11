@@ -3,14 +3,14 @@
 use Inc\Connection;
 use Inc\Content;
 use Inc\Marketplace;
+use Inc\PDF;
 use Inc\Resource;
+use Inc\XLS;
 
 error_reporting(E_ALL ^ E_DEPRECATED ^ E_NOTICE ^ E_WARNING);
 
 require __DIR__ . '/vendor/autoload.php';
 require __DIR__ . '/config.php';
-require __DIR__ . '/include/pdf.php';
-require __DIR__ . '/include/xls.php';
 
     const SORT_PRIORITY = [
         "iPhone 11",

@@ -2,6 +2,12 @@
 
 declare(strict_types=1);
 
+namespace Inc;
+
+use PHPExcel;
+use PHPExcel_IOFactory;
+use PHPExcel_Worksheet_Drawing;
+
 class XLS
 {
     const HEADERS = [

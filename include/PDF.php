@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+namespace Inc;
+
+use TCPDF;
+
 define('K_TCPDF_THROW_EXCEPTION_ERROR', true);
 
 class PDF

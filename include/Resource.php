@@ -15,7 +15,6 @@ class Resource
         $this->url = "$url/";
     }
 
-
     function download(string $path, int $tries = 1)
     {
         $path = ltrim($path, '/');
