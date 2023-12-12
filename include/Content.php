@@ -13,36 +13,34 @@ class Content
         $this->connection = $connection;
     }
 
-    public function productByVendor(array $vendors)
+    public function productByVendor(string $sku)
     {
-        $json = $this->connection->post('content/v1/cards/filter', ['vendorCodes' => $vendors]);
+        $json = $this->connection->post(
+            'content/v2/get/cards/list', ['settings' => ['filter' => ['withPhoto' => -1, 'textSearch' => $sku]]]
+        );
 
         if (!$json) {
             sleep(1);
-            $json = $this->connection->post('content/v1/cards/filter', ['vendorCodes' => $vendors]);
+            $json = $this->connection->post(
+                'content/v2/get/cards/list', ['settings' => ['filter' => ['withPhoto' => -1, 'textSearch' => $sku]]]
+            );
         }
 
         $r = json_decode($json, false, 512, JSON_THROW_ON_ERROR);
 
-        foreach ($r->data as $product) {
-            if (in_array($product->vendorCode, $vendors)) {
-                return $this->productNormalize($product);
-            }
-        }
-
-        return null;
+        return $this->productNormalize(current($r->cards));
     }
 
     private function productNormalize($product)
     {
-        foreach ($product->characteristics as $objValue) {
-            if (isset($objValue->{'Предмет'})) {
-                $product->subject = $objValue->{'Предмет'};
-            }
-            if (isset($objValue->{'Наименование'})) {
-                $product->name = $objValue->{'Наименование'};
-            }
-        }
+        $product->subject = $product->subjectName;
+        $product->name = $product->title;
+        $product->mediaFiles = array_map(
+            function ($item) {
+                return $item->big;
+            },
+            $product->photos
+        );
 
         return $product;
     }

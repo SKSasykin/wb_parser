@@ -74,7 +74,7 @@ echo "\nOrders count: ", count($orders), "\n";
     $orderIds = [];
     foreach($orders as $order) {
         $orderIds[]   = (int) $order->id;
-        $order->product = $content->productByVendor([$order->article]);
+        $order->product = $content->productByVendor($order->nmId);
         $order->sort  = sortNameNormalize($order->product->name);
     }
 //    print_r($orders);exit;
@@ -99,10 +99,8 @@ echo "\nOrders count: ", count($orders), "\n";
         $num = $order->nmId;
         $fileUrl = "/c246x328/new/$znum/$num-1.jpg";
 
-        $product = $content->productByVendor([$order->article]);
-
-        if ($product && $imgs =
-                array_filter($product->mediaFiles,
+        if ($order->product && $imgs =
+                array_filter($order->product->mediaFiles,
                     fn($file) => in_array(substr($file,-3), ['png','jpg']))) {
 //print_r($imgs);exit;
             natsort($imgs);
