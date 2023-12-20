@@ -76,6 +76,7 @@ echo "\nOrders count: ", count($orders), "\n";
         $orderIds[]   = (int) $order->id;
         $order->product = $content->productByVendor($order->nmId);
         $order->sort  = sortNameNormalize($order->product->name);
+        sleep(2);
     }
 //    print_r($orders);exit;
 //    print_r($orderIds);exit;
