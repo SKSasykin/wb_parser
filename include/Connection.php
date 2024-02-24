@@ -6,6 +6,8 @@ namespace Inc;
 
 class Connection
 {
+    private const MAX_TRIES = 5;
+
     private string $url;
     private string $key;
 
@@ -55,7 +57,16 @@ class Connection
             'Authorization: ' . $this->key,
         ]);
 
-        $doc = curl_exec($ch);
+        $tries = 0;
+        do {
+            $doc = curl_exec($ch);
+        } while($doc === false && ++$tries<self::MAX_TRIES);
+
+        if(!$doc) {
+            echo "[!] Error connection\n ", curl_errno($ch), ":", curl_error($ch);
+            exit;
+        }
+
         curl_close($ch);
 
         return $doc;

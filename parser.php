@@ -69,14 +69,16 @@ require __DIR__ . '/config.php';
 
 //$orders = array_filter($orders, fn($order) => $order->id==983898673);
 
-echo "\nOrders count: ", count($orders), "\n";
+    echo "\nOrders count: ", count($orders), "\n";
 
+    echo "download products: \n";
     $orderIds = [];
-    foreach($orders as $order) {
+    foreach($orders as $i => $order) {
         $orderIds[]   = (int) $order->id;
+        echo " - order [", $i+1, "]:$order->id\n";
         $order->product = $content->productByVendor($order->nmId);
         $order->sort  = sortNameNormalize($order->product->name);
-        sleep(2);
+        sleep(1);
     }
 //    print_r($orders);exit;
 //    print_r($orderIds);exit;
@@ -109,7 +111,7 @@ echo "\nOrders count: ", count($orders), "\n";
             $fileUrl = str_replace('/big/','/c246x328/', current($imgs));
         }
 
-        echo " - img order:$order->id:$order->article > $fileUrl";
+        echo " - img [order:$order->id]: $order->article > $fileUrl";
 //print_r($product); exit;
         $fileData = $resource->download($fileUrl, 3);
 

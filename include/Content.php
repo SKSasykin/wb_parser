@@ -19,13 +19,6 @@ class Content
             'content/v2/get/cards/list', ['settings' => ['filter' => ['withPhoto' => -1, 'textSearch' => $sku]]]
         );
 
-        if (!$json) {
-            sleep(1);
-            $json = $this->connection->post(
-                'content/v2/get/cards/list', ['settings' => ['filter' => ['withPhoto' => -1, 'textSearch' => $sku]]]
-            );
-        }
-
         $r = json_decode($json, false, 512, JSON_THROW_ON_ERROR);
 
         return $this->productNormalize(current($r->cards));
