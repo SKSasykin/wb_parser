@@ -2,6 +2,7 @@
 
 use Inc\Connection;
 use Inc\Content;
+use Inc\Image;
 use Inc\Marketplace;
 use Inc\PDF;
 use Inc\Resource;
@@ -47,7 +48,7 @@ require __DIR__ . '/config.php';
     $marketplace = new Marketplace(new Connection(KEY_MARKETPLACE, URL));
     $content = new Content(new Connection(KEY_CONTENT, URL));
 
-    $resource = new Resource('https://images.wbstatic.net');
+    $resource = new Resource();
 
     ignore_user_abort(true);
     set_time_limit(0);
@@ -98,25 +99,14 @@ require __DIR__ . '/config.php';
     echo "download images: \n";
 
     foreach ($orders as $order) {
-        $znum = substr($order->nmId, 0, -4) . '0000';
-        $num = $order->nmId;
-        $fileUrl = "/c246x328/new/$znum/$num-1.jpg";
+        $image = new Image($order);
 
-        if ($order->product && $imgs =
-                array_filter($order->product->mediaFiles,
-                    fn($file) => in_array(substr($file,-3), ['png','jpg']))) {
-//print_r($imgs);exit;
-            natsort($imgs);
+        echo " - img [order:$order->id]: $order->article > {$image->getUrl()}";
 
-            $fileUrl = str_replace('/big/','/c246x328/', current($imgs));
-        }
-
-        echo " - img [order:$order->id]: $order->article > $fileUrl";
-//print_r($product); exit;
-        $fileData = $resource->download($fileUrl, 3);
+        $fileData = $resource->download($image->getUrl());
 
         if($fileData) {
-            file_put_contents($file = __DIR__ . "/tmp/$num-1.jpg", $fileData);
+            file_put_contents($file = __DIR__ . "/tmp/$order->nmId-1.jpg", $fileData);
         } else {
             $file = '';
         }
@@ -129,7 +119,7 @@ require __DIR__ . '/config.php';
             $order->nmId,
             $order->product->subject,
             $order->product->name,
-            $fileUrl
+            $image->getUrl()
         );
 
         $pdf->addBarcodePage(base64_decode($stickers[$order->id]));

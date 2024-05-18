@@ -6,28 +6,13 @@ namespace Inc;
 
 class Resource
 {
-    private string $url;
-
-    public function __construct(string $url)
+    function download(string $url, int $tries = 5): string
     {
-        $url = rtrim($url, '/');
-
-        $this->url = "$url/";
-    }
-
-    function download(string $path, int $tries = 1)
-    {
-        $path = ltrim($path, '/');
-
-        $url = !strncasecmp($path, 'http', 4) ? $path : "$this->url/$path";
-
         $ch = curl_init();
 
         curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/6.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
         curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-
-        curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/6.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
+        curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/7.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
@@ -44,7 +29,6 @@ class Resource
         }
         curl_close($ch);
 
-        return $doc;
+        return (string) $doc;
     }
-
 }
