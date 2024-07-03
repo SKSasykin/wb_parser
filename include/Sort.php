@@ -6,21 +6,32 @@ namespace Inc;
 
 class Sort
 {
-    private $priority;
+    private array $priorityFilenames;
 
-    public function __construct(string $fileName)
+    public function __construct(string $filename)
     {
-        $this->priority = file($fileName, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        $this->priorityFilenames = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
+        $this->priorityFilenames = array_map(function ($filename) {
+            return $this->removeDoubleSpace($filename);
+        }, $this->priorityFilenames);
     }
 
-    function normalize($name): string
+    public function normalize($name): string
     {
-        foreach ($this->priority as $item) {
-            if (stripos($name, $item) !== false) {
-                return strtolower($item);
+        $name = $this->removeDoubleSpace($name);
+
+        foreach ($this->priorityFilenames as $index => $filename) {
+            if (stripos($name, $filename) !== false) {
+                return $index . ' ' . strtolower($filename);
             }
         }
 
-        return 'z';
+        return '~';
+    }
+
+    private function removeDoubleSpace(string $string): string
+    {
+        return preg_replace('/\s+/', ' ', $string);
     }
 }

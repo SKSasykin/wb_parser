@@ -1,7 +1,8 @@
-/config.php
+/config*.php
 /.idea/
 /out/
 /tmp/
 Thumbs.db*
 *.lock
 *.txt
+*.dat

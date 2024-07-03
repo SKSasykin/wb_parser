@@ -20,9 +20,7 @@ require __DIR__ . '/config.php';
     $marketplace = new Marketplace(new Connection(KEY_MARKETPLACE, URL));
     $content = new Content(new Connection(KEY_CONTENT, URL));
 
-    $sortFile = __DIR__ . '/sort.txt';
-
-    if(!file_exists($sortFile)) {
+    if(!file_exists($sortFile = __DIR__ . '/sort.txt')) {
         file_put_contents($sortFile, '');
     }
     $sort = new Sort($sortFile);
@@ -60,7 +58,7 @@ require __DIR__ . '/config.php';
         $order->sort  = $sort->normalize($order->product->name);
         sleep(1);
     }
-//    print_r($orders);exit;
+//    print_r($orders);
 //    print_r($orderIds);exit;
 
 //    file_put_contents('hz.dat', serialize($orders));exit;
@@ -70,11 +68,29 @@ require __DIR__ . '/config.php';
     $stickers = $marketplace->stickers3($orderIds);
 //    print_r($stickers);exit;
     echo "done\nsorting... ";
-    usort($orders, function($a, $b) {
+    usort($orders, function($a, $b) use ($sort) {
+        $ia = (int) $a->sort;
+        $ib = (int) $b->sort;
+        if ($ia > 0 && $ib > 0) {
+            if ($ia > $ib) {
+                return 1;
+            } elseif ($ib > $ia) {
+                return -1;
+            } else {
+                return 0;
+            }
+        }
+
         return strcmp($a->sort . $a->nmId, $b->sort . $b->nmId);
     });
     echo "done\n";
 
+//print_r($orders);
+//print_r(array_slice(array_reduce($orders, function ($orders, $item) {
+//    $orders[] = $item->sort;
+//    return $orders;
+//}, []),0, 100));
+//exit;
     echo "download images: \n";
 
     foreach ($orders as $order) {
