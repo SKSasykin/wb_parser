@@ -6,6 +6,7 @@ use Inc\Image;
 use Inc\Marketplace;
 use Inc\PDF;
 use Inc\Resource;
+use Inc\Sort;
 use Inc\XLS;
 
 error_reporting(E_ALL ^ E_DEPRECATED ^ E_NOTICE ^ E_WARNING);
@@ -13,40 +14,18 @@ error_reporting(E_ALL ^ E_DEPRECATED ^ E_NOTICE ^ E_WARNING);
 require __DIR__ . '/vendor/autoload.php';
 require __DIR__ . '/config.php';
 
-    const SORT_PRIORITY = [
-        "iPhone 11",
-        "iPhone 11 pro",
-        "iPhone 11 pro max",
-        "iPhone 12 mini",
-        "iPhone 12",
-        "iPhone 12 pro",
-        "iPhone 12 pro max",
-        "iPhone 13 mini",
-        "iPhone 13",
-        "iPhone 13 pro",
-        "iPhone 13 pro max",
-        "iPhone 14",
-        "iPhone 14 plus",
-        "iPhone 14 pro",
-        "iPhone 14 pro max",
-        "Samsung A12",
-        "Samsung A13",
-        "Samsung A23",
-        "Samsung A32",
-        "Samsung A33",
-        "Samsung A50",
-        "Samsung A51",
-        "Samsung A52",
-        "Samsung A53",
-        "Samsung A73",
-        "Samsung S22",
-    ];
-
     $pdf = new PDF();
     $xls = new XLS();
 
     $marketplace = new Marketplace(new Connection(KEY_MARKETPLACE, URL));
     $content = new Content(new Connection(KEY_CONTENT, URL));
+
+    $sortFile = __DIR__ . '/sort.txt';
+
+    if(!file_exists($sortFile)) {
+        file_put_contents($sortFile, '');
+    }
+    $sort = new Sort($sortFile);
 
     $resource = new Resource();
 
@@ -58,7 +37,7 @@ require __DIR__ . '/config.php';
     $supplies = $marketplace->supply(100, 37099783);
 //    print_r($supplies);exit;
     if(!$supplies) {
-        exit('not found supply');
+        exit("not found supply\n");
     }
 
     echo 'Supplies:', PHP_EOL;
@@ -78,7 +57,7 @@ require __DIR__ . '/config.php';
         $orderIds[]   = (int) $order->id;
         echo " - order [", $i+1, "]:$order->id\n";
         $order->product = $content->productByVendor($order->nmId);
-        $order->sort  = sortNameNormalize($order->product->name);
+        $order->sort  = $sort->normalize($order->product->name);
         sleep(1);
     }
 //    print_r($orders);exit;
@@ -135,13 +114,3 @@ require __DIR__ . '/config.php';
     $xls->output($xlsFile = __DIR__.'/out/file-'.$timestamp.'.xls');
 
     echo " $pdfFile,\n $xlsFile\n\ndone";
-
-    function sortNameNormalize($name): string {
-        foreach (SORT_PRIORITY as $item) {
-            if(stripos($name, $item) !== false) {
-                return strtolower($item);
-            }
-        }
-
-        return 'z';
-    }
