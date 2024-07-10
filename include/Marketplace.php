@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Inc;
 
+use Inc\Entity\Order;
+use JsonException;
+
 class Marketplace
 {
     private Connection $connection;
@@ -13,7 +16,7 @@ class Marketplace
         $this->connection = $connection;
     }
 
-    public function supply($limit = 50, $offset = 0)
+    public function supply($limit = 50, $offset = 0): array
     {
 //        echo "+$offset \n";
 
@@ -34,16 +37,23 @@ class Marketplace
         return [];
     }
 
-    public function orders($supply)
+    /**
+     * @param $supply
+     * @return Order[]
+     * @throws JsonException
+     */
+    public function orders($supply): array
     {
         $json = $this->connection->get('api/v3/supplies/' . $supply . '/orders');
 
         $r = json_decode($json, false, 512, JSON_THROW_ON_ERROR);
 
-        return $r->orders;
+        return array_map(function(object $item) {
+            return Order::fromObject($item);
+        }, $r->orders);
     }
 
-    function stickers3($orderIds)
+    function stickers3($orderIds): array
     {
         $result = [];
 
@@ -65,7 +75,7 @@ class Marketplace
         return $result;
     }
 
-    private function filterSupplyNotDone($array)
+    private function filterSupplyNotDone($array): array
     {
         return array_filter(
             $array,
