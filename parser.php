@@ -98,7 +98,7 @@ require __DIR__ . '/config.php';
         );
 
         $pdf->addBarcodePage(base64_decode($stickers[$order->id]));
-        $pdf->addOwnerPage(current($order->skus), $order->article, $order->product->subjectName);
+        $pdf->addOwnerPage(current($order->skus), $order->article, $order->product->subjectName, OWNER);
 
         echo "\n";
     }
