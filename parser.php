@@ -14,7 +14,7 @@ error_reporting(E_ALL ^ E_DEPRECATED ^ E_NOTICE ^ E_WARNING);
 ignore_user_abort(true);
 set_time_limit(0);
 
-ini_set('memory_limit', '512M');
+ini_set('memory_limit', '1G');
 
 require __DIR__ . '/vendor/autoload.php';
 require __DIR__ . '/config.php';
