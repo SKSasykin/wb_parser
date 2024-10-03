@@ -76,12 +76,16 @@ require __DIR__ . '/config.php';
 
     /** @var Order $order */
     foreach ($orders as $order) {
-        echo " - img [order:$order->id]: $order->article > {$order->product->firstPhoto()->getC246x328Url()}";
+        echo " - img [order:$order->id]: $order->article > {$order->product->firstPhoto()->c246x328}";
 
-        $fileData = $resource->download($order->product->firstPhoto()->getC246x328Url());
+        $fileData = $resource->download($order->product->firstPhoto()->c246x328);
 
         if($fileData) {
-            file_put_contents($file = __DIR__ . "/tmp/$order->nmId-1.jpg", $fileData);
+            file_put_contents($fileWebp = __DIR__ . "/tmp/$order->nmId-1.webp", $fileData);
+            $file = __DIR__ . "/tmp/$order->nmId-1.webp.jpg";
+
+            $null = (PHP_OS_FAMILY === 'Windows') ? 'nul' : '/dev/null';
+            exec('ffmpeg -y -i ' . $fileWebp . ' ' . $file . " > $null 2>&1");
         } else {
             $file = '';
         }
@@ -94,7 +98,7 @@ require __DIR__ . '/config.php';
             $order->nmId,
             $order->product->subjectName,
             $order->product->title,
-            $order->product->firstPhoto()->getC246x328Url()
+            $order->product->firstPhoto()->c246x328
         );
 
         $pdf->addBarcodePage(base64_decode($stickers[$order->id]));

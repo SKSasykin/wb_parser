@@ -14,6 +14,9 @@ PHP https://windows.php.net/downloads/releases/php-7.4.33-Win32-vc15-x64.zip
 * extension=curl
 * добавить установленный каталог в переменные окружения Path (винды), что бы cmd "видела" php в любом каталоге
 
+FFmpeg https://ffmpeg.org/
+* добавить установленный каталог в переменные окружения Path (винды), что бы cmd "видела" php в любом каталоге
+
 
 ### Каталоги
 

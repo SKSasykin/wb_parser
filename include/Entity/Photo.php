@@ -11,9 +11,4 @@ class Photo extends AbstractEntity
     public string $c516x688;
     public string $square;
     public string $tm;
-
-    public function getC246x328Url()
-    {
-        return str_replace('.webp','.jpg', $this->c246x328);
-    }
 }
