@@ -1,6 +1,7 @@
 <?php
 
-define('URL', 'https://suppliers-api.wildberries.ru');
+define('URL_MARKETPLACE', 'https://marketplace-api.wildberries.ru');
+define('URL_CONTENT', 'https://content-api.wildberries.ru');
 
 define('KEY_MARKETPLACE', '');
 define('KEY_CONTENT', '');

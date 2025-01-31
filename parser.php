@@ -22,8 +22,8 @@ require __DIR__ . '/config.php';
     $pdf = new PDF();
     $xls = new XLS();
 
-    $marketplace = new Marketplace(new Connection(KEY_MARKETPLACE, URL));
-    $content = new Content(new Connection(KEY_CONTENT, URL));
+    $marketplace = new Marketplace(new Connection(KEY_MARKETPLACE, URL_MARKETPLACE));
+    $content = new Content(new Connection(KEY_CONTENT, URL_CONTENT));
 
     if(!file_exists($sortFile = __DIR__ . '/sort.txt')) {
         file_put_contents($sortFile, '');
