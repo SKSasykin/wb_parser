@@ -19,7 +19,15 @@ class Connection
         $this->key = $key;
     }
 
-    public function get(string $path, array $data = []): string
+    /**
+     * @param string $path
+     * @param array $data
+     * @return object|mixed
+     * @throws AuthException
+     * @throws ConnectionException
+     * @throws \JsonException
+     */
+    public function get(string $path, array $data = []): object
     {
         $path = ltrim($path, '/');
 
@@ -33,14 +41,22 @@ class Connection
             'Authorization: ' . $this->key,
         ]);
 
-        $doc = curl_exec($ch);
-//        print_r(curl_error($ch));
+        $result = $this->extractResult($ch);
+
         curl_close($ch);
 
-        return $doc;
+        return $result;
     }
 
-    public function post(string $path, array $data = []): string
+    /**
+     * @param string $path
+     * @param array $data
+     * @return object|mixed
+     * @throws AuthException
+     * @throws ConnectionException
+     * @throws \JsonException
+     */
+    public function post(string $path, array $data = []): object
     {
         $path = ltrim($path, '/');
 
@@ -57,19 +73,11 @@ class Connection
             'Authorization: ' . $this->key,
         ]);
 
-        $tries = 0;
-        do {
-            $doc = curl_exec($ch);
-        } while($doc === false && ++$tries<self::MAX_TRIES);
-
-        if(!$doc) {
-            echo "[!] Error connection\n ", curl_errno($ch), ":", curl_error($ch);
-            exit;
-        }
+        $result = $this->extractResult($ch);
 
         curl_close($ch);
 
-        return $doc;
+        return $result;
     }
 
     private function commonConfig($ch): void
@@ -79,5 +87,32 @@ class Connection
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+    }
+
+    /**
+     * @param $ch
+     * @return object|mixed
+     * @throws AuthException
+     * @throws ConnectionException
+     * @throws \JsonException
+     */
+    private function extractResult($ch): object
+    {
+        $tries = 0;
+        do {
+            $doc = curl_exec($ch);
+        } while($doc === false && ++$tries<self::MAX_TRIES);
+
+        if(!$doc) {
+            throw new ConnectionException($this->url);
+        }
+
+        $result = json_decode($doc, false, 512, JSON_THROW_ON_ERROR);
+
+        if(curl_getinfo($ch, CURLINFO_HTTP_CODE) === 401) {
+            throw new AuthException($this->url);
+        }
+
+        return $result;
     }
 }

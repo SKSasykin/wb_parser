@@ -1,7 +1,10 @@
 <?php
 
+use Inc\AuthException;
 use Inc\Connection;
+use Inc\ConnectionException;
 use Inc\Content;
+use Inc\ErrorHandler;
 use Inc\Entity\Order;
 use Inc\Marketplace;
 use Inc\PDF;
@@ -19,6 +22,8 @@ ini_set('memory_limit', '1G');
 require __DIR__ . '/vendor/autoload.php';
 require __DIR__ . '/config.php';
 
+    new ErrorHandler();
+
     $pdf = new PDF();
     $xls = new XLS();
 
@@ -32,10 +37,10 @@ require __DIR__ . '/config.php';
 
     $resource = new Resource();
 
-    $supplies = $marketplace->supply(100, 37099783);
+    $supplies = $marketplace->supply(100, 157614173);
 
     if(!$supplies) {
-        exit("not found supply\n");
+        exit("\nnot found supply\n");
     }
 
     echo 'Supplies:', PHP_EOL;

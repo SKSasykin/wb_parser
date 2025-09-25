@@ -22,16 +22,14 @@ class Marketplace
 
         $json = $this->connection->get('api/v3/supplies', ['next' => $offset, 'limit' => $limit,]);
 
-        $r = json_decode($json, false, 512, JSON_THROW_ON_ERROR);
-
-        if (count($r->supplies)) {
-            $items = $this->supply($limit, $r->next);
+        if (count($json->supplies)) {
+            $items = $this->supply($limit, $json->next);
 
             if (count($items)) {
-                return $this->filterSupplyNotDone(array_merge($items, $r->supplies));
+                return $this->filterSupplyNotDone(array_merge($items, $json->supplies));
             }
 
-            return $this->filterSupplyNotDone($r->supplies);
+            return $this->filterSupplyNotDone($json->supplies);
         }
 
         return [];
@@ -40,17 +38,15 @@ class Marketplace
     /**
      * @param $supply
      * @return Order[]
-     * @throws JsonException
+     * @throws ConnectionException
      */
     public function orders($supply): array
     {
         $json = $this->connection->get('api/v3/supplies/' . $supply . '/orders');
 
-        $r = json_decode($json, false, 512, JSON_THROW_ON_ERROR);
-
         return array_map(function(object $item) {
             return Order::fromObject($item);
-        }, $r->orders);
+        }, $json->orders);
     }
 
     function stickers3($orderIds): array
@@ -60,14 +56,7 @@ class Marketplace
         foreach(array_chunk($orderIds, 100) as $chunk) {
             $json = $this->connection->post('api/v3/orders/stickers?type=svg&width=58&height=40', ['orders' => $chunk]);
 
-            if(!$json) {
-                sleep(1);
-                $json = $this->connection->post('api/v3/orders/stickers?type=svg&width=58&height=40', ['orders' => $chunk]);
-            }
-
-            $r = json_decode($json, false, 512, JSON_THROW_ON_ERROR);
-
-            foreach($r->stickers as $sticker) {
+            foreach($json->stickers as $sticker) {
                 $result[$sticker->orderId] = $sticker->file;
             }
         }

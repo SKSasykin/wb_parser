@@ -17,7 +17,7 @@ class Content
     }
 
     /**
-     * @throws JsonException
+     * @throws ConnectionException
      */
     public function productByVendor(string $sku): Product
     {
@@ -25,8 +25,6 @@ class Content
             'content/v2/get/cards/list', ['settings' => ['filter' => ['withPhoto' => -1, 'textSearch' => $sku]]]
         );
 
-        $data = json_decode($json, false, 512, JSON_THROW_ON_ERROR);
-
-        return Product::fromObject(current($data->cards));
+        return Product::fromObject(current($json->cards));
     }
 }
