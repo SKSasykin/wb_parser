@@ -90,7 +90,7 @@ require __DIR__ . '/config.php';
             $file = __DIR__ . "/tmp/$order->nmId-1.webp.jpg";
 
             $null = (PHP_OS_FAMILY === 'Windows') ? 'nul' : '/dev/null';
-            exec('ffmpeg -y -i ' . $fileWebp . ' ' . $file . " > $null 2>&1");
+            exec('ffmpeg -y -i "' . $fileWebp . '" "' . $file . '" > ' . $null . ' 2>&1');
         } else {
             $file = '';
         }
