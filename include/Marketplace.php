@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Inc;
 
 use Inc\Entity\Order;
-use JsonException;
+use Inc\Exception\AuthException;
+use Inc\Exception\ConnectionException;
 
 class Marketplace
 {
@@ -16,6 +17,14 @@ class Marketplace
         $this->connection = $connection;
     }
 
+    /**
+     * @param $limit
+     * @param $offset
+     * @return array
+     * @throws ConnectionException
+     * @throws AuthException
+     * @throws \JsonException
+     */
     public function supply($limit = 50, $offset = 0): array
     {
 //        echo "+$offset \n";
@@ -36,20 +45,48 @@ class Marketplace
     }
 
     /**
-     * @param $supply
+     * @param $supplyId
      * @return Order[]
      * @throws ConnectionException
+     * @throws AuthException
+     * @throws \JsonException
      */
-    public function orders($supply): array
+    public function orders($supplyId, string $dateFrom): array
     {
-        $json = $this->connection->get('api/v3/supplies/' . $supply . '/orders');
+        $json = $this->connection->get('api/marketplace/v3/supplies/' . $supplyId . '/order-ids');
+//file_put_contents('123.db', serialize($json));
+//$json = unserialize(file_get_contents('123.db'));
+
+        $orderIds = $json->orderIds;
+
+        $orders = [];
+
+        do {
+            $json = $this->connection->get('api/v3/orders',
+                ['limit' => 1000, 'next' => $json->next ?? 0, 'dateFrom' => strtotime($dateFrom) - 86400*7]
+            );
+
+            $orders = array_merge($orders,
+                array_filter($json->orders, function($item) use ($supplyId, $orderIds) {
+                    return $item->supplyId == $supplyId && in_array($item->id, $orderIds);
+                })
+            );
+//            echo "+$json->next", PHP_EOL;
+        } while (count($json->orders));
 
         return array_map(function(object $item) {
             return Order::fromObject($item);
-        }, $json->orders);
+        }, $orders);
     }
 
-    function stickers3($orderIds): array
+    /**
+     * @param $orderIds
+     * @return array
+     * @throws AuthException
+     * @throws ConnectionException
+     * @throws \JsonException
+     */
+    public function stickers3($orderIds): array
     {
         $result = [];
 

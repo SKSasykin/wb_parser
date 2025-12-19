@@ -14,10 +14,12 @@ class Order extends AbstractEntity
     public string $colorCode;
     public string $rid;
     public string $createdAt;
+
     /**
      * @var string[]
      */
     public ?array $offices;
+
     /**
      * @var string[]
      */
@@ -32,6 +34,7 @@ class Order extends AbstractEntity
     public int $cargoType;
     public bool $isZeroOrder;
     public ?Product $product = null;
+    public string $deliveryType;
 
     protected function mapping(): array
     {
@@ -40,3 +43,12 @@ class Order extends AbstractEntity
         ];
     }
 }
+//
+//
+//[address] =>
+//[supplyId] => WB-GI-204503448
+//[options] => stdClass Object
+//(
+//    [isB2B] =>
+//)
+//[officeId] => 242

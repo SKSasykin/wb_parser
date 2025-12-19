@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Inc;
+namespace Inc\Exception;
 
-class AuthException extends \Exception
+class ConnectionException extends \Exception
 {
     private string $url;
 

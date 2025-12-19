@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Inc;
 
 use Inc\Entity\Product;
-use JsonException;
-
+use Inc\Exception\AuthException;
+use Inc\Exception\ConnectionException;
 class Content
 {
     private Connection $connection;
@@ -17,7 +17,11 @@ class Content
     }
 
     /**
+     * @param string $sku
+     * @return Product
      * @throws ConnectionException
+     * @throws AuthException
+     * @throws \JsonException
      */
     public function productByVendor(string $sku): Product
     {

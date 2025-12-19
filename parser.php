@@ -1,11 +1,9 @@
 <?php
 
-use Inc\AuthException;
 use Inc\Connection;
-use Inc\ConnectionException;
 use Inc\Content;
-use Inc\ErrorHandler;
 use Inc\Entity\Order;
+use Inc\ErrorHandler;
 use Inc\Marketplace;
 use Inc\PDF;
 use Inc\Resource;
@@ -40,7 +38,7 @@ require __DIR__ . '/config.php';
     $supplies = $marketplace->supply(100, 157614173);
 
     if(!$supplies) {
-        exit("\nnot found supply\n");
+        exit("\n[ERROR]: Supply not found\n");
     }
 
     echo 'Supplies:', PHP_EOL;
@@ -49,7 +47,7 @@ require __DIR__ . '/config.php';
     $orders = [];
     foreach($supplies as $supply) {
         echo ' - ', $supply->id, ': ', $supply->name, PHP_EOL;
-        $orders = array_merge($orders, $marketplace->orders($supply->id));
+        $orders = array_merge($orders, $marketplace->orders($supply->id, substr($supply->createdAt, 0, 10)));
     }
 
     echo "\nOrders count: ", count($orders), "\n";

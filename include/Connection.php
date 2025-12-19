@@ -4,12 +4,18 @@ declare(strict_types=1);
 
 namespace Inc;
 
+use Inc\Exception\AuthException;
+use Inc\Exception\ConnectionException;
+use Inc\Exception\LimitException;
+
 class Connection
 {
     private const MAX_TRIES = 5;
 
     private string $url;
     private string $key;
+
+    private string $fullUrl;
 
     public function __construct(string $key, string $url)
     {
@@ -34,7 +40,7 @@ class Connection
         $ch = curl_init();
         $this->commonConfig($ch);
 
-        curl_setopt($ch, CURLOPT_URL, "$this->url/$path?" . http_build_query($data));
+        curl_setopt($ch, CURLOPT_URL, $this->fullUrl = "$this->url/$path?" . http_build_query($data));
         curl_setopt($ch, CURLOPT_TIMEOUT, 60);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Accept: application/json',
@@ -63,7 +69,7 @@ class Connection
         $ch = curl_init();
         $this->commonConfig($ch);
 
-        curl_setopt($ch, CURLOPT_URL, "$this->url/$path");
+        curl_setopt($ch, CURLOPT_URL, $this->fullUrl = "$this->url/$path");
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
         curl_setopt($ch, CURLOPT_TIMEOUT, 60);
@@ -104,13 +110,20 @@ class Connection
         } while($doc === false && ++$tries<self::MAX_TRIES);
 
         if(!$doc) {
-            throw new ConnectionException($this->url);
+            throw new ConnectionException($this->fullUrl);
         }
 
         $result = json_decode($doc, false, 512, JSON_THROW_ON_ERROR);
 
         if(curl_getinfo($ch, CURLINFO_HTTP_CODE) === 401) {
-            throw new AuthException($this->url);
+            throw new AuthException($this->fullUrl);
+        }
+
+        if(curl_getinfo($ch, CURLINFO_HTTP_CODE) === 400) {
+            if($result->code == 'UploadDataLimit') {
+                throw new LimitException($this->fullUrl);
+            }
+
         }
 
         return $result;
